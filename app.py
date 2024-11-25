@@ -11,8 +11,26 @@ from openai import OpenAI
 # Load environment variables
 load_dotenv()
 
-st.title("Mounaim's resume")
-st.subheader("Interact with Mounaim's resume to learn more about his experience, skills, and achievements.")
+#st.title("Mounaim's resume")
+#st.subheader("Interact with Mounaim's resume to learn more about his experience, skills, and achievements.")
+
+import streamlit as st
+
+# Assuming 'image_path' is the local file path or URL to the image you want to display
+image_path = "pic.png"  # Replace with your image path
+
+# Create two columns: one for the image and one for the title
+col1, col2 = st.columns([1, 5])  # Adjust column width ratio (1:5 for image to title)
+
+# Add image to the left column
+with col1:
+    st.image(image_path, width=50)  # Adjust width as needed
+
+# Add title to the right column
+with col2:
+    st.title("Mounaim's Resume")
+    st.subheader("Interact with Mounaim's resume to learn more about his experience, skills, and achievements.")
+
 
 USER_AVATAR = "👤"
 BOT_AVATAR = "🤖"
