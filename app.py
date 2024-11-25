@@ -75,39 +75,19 @@ def retrieve_context(query):
     context = "\n".join([doc.page_content for doc in docs])
     return context
 
-# Display predefined buttons just above the chat box
+# Display predefined buttons just above the chat box with a more structured layout
 st.write("Quick Starters:")
-col1, col2, col3, col4 = st.columns(4)
 
-def handle_predefined_question(question):
-    # Add the predefined question to the chat history
-    st.session_state.messages.append({"role": "user", "content": question})
-    with st.chat_message("user", avatar=USER_AVATAR):
-        st.markdown(question)
-
-    # Retrieve context from vectorstore and generate response
-    context = retrieve_context(question)
-    full_prompt = f"Context: {context}\n\nQuestion: {question}"
-
-    with st.chat_message("assistant", avatar=BOT_AVATAR):
-        message_placeholder = st.empty()
-        full_response = ""
-        for response in client.chat.completions.create(
-            model=st.session_state["openai_model"],
-            messages=[{"role": "user", "content": full_prompt}],
-            stream=True,
-        ):
-            full_response += response.choices[0].delta.content or ""
-            message_placeholder.markdown(full_response + "|")
-        message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
-
+# Create a 2x2 grid layout for the buttons
+col1, col2 = st.columns(2)
 with col1:
     if st.button("Who is Mounaim?"):
         handle_predefined_question("Who is Mounaim?")
 with col2:
     if st.button("Key Skills"):
         handle_predefined_question("What are Mounaim's key skills?")
+
+col3, col4 = st.columns(2)
 with col3:
     if st.button("Work Experience"):
         handle_predefined_question("Describe Mounaim's work experience.")
@@ -116,7 +96,7 @@ with col4:
         handle_predefined_question("What projects has Mounaim worked on?")
 
 # Main chat interface with a more engaging prompt
-if prompt := st.chat_input("Ask me something about Mounaim, or try one of the buttons above!"):
+if prompt := st.chat_input("Curious about Mounaim's skills or background? Ask me anything!"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user", avatar=USER_AVATAR):
         st.markdown(prompt)
