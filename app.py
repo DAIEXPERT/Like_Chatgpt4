@@ -12,6 +12,7 @@ from openai import OpenAI
 load_dotenv()
 
 st.title("Mounaim's resume")
+st.subheader("Interact with Mounaim's resume to learn more about his experience, skills, and achievements.")
 
 USER_AVATAR = "👤"
 BOT_AVATAR = "🤖"
