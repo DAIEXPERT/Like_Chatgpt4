@@ -11,7 +11,9 @@ from openai import OpenAI
 # Load environment variables
 load_dotenv()
 
-st.title("Mounaim's resume")
+st.title("Mounaim's Resume Chatbot")
+st.subheader("Interact with Mounaim's resume to learn more about his experience, skills, and achievements.")
+st.write("Ask questions about the content of the resume, or click one of the predefined questions below to get started!")
 
 USER_AVATAR = "👤"
 BOT_AVATAR = "🤖"
@@ -73,20 +75,48 @@ def retrieve_context(query):
     context = "\n".join([doc.page_content for doc in docs])
     return context
 
-# Sidebar with a button to delete chat history
-with st.sidebar:
-    if st.button("Delete Chat History"):
-        st.session_state.messages = []
-        save_chat_history([])
+# Display predefined buttons just above the chat box
+st.write("Quick Starters:")
+col1, col2, col3, col4 = st.columns(4)
 
-# Display chat messages
-for message in st.session_state.messages:
-    avatar = USER_AVATAR if message["role"] == "user" else BOT_AVATAR
-    with st.chat_message(message["role"], avatar=avatar):
-        st.markdown(message["content"])
+def handle_predefined_question(question):
+    # Add the predefined question to the chat history
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user", avatar=USER_AVATAR):
+        st.markdown(question)
 
-# Main chat interface
-if prompt := st.chat_input("How can I help?"):
+    # Retrieve context from vectorstore and generate response
+    context = retrieve_context(question)
+    full_prompt = f"Context: {context}\n\nQuestion: {question}"
+
+    with st.chat_message("assistant", avatar=BOT_AVATAR):
+        message_placeholder = st.empty()
+        full_response = ""
+        for response in client.chat.completions.create(
+            model=st.session_state["openai_model"],
+            messages=[{"role": "user", "content": full_prompt}],
+            stream=True,
+        ):
+            full_response += response.choices[0].delta.content or ""
+            message_placeholder.markdown(full_response + "|")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+with col1:
+    if st.button("Who is Mounaim?"):
+        handle_predefined_question("Who is Mounaim?")
+with col2:
+    if st.button("Key Skills"):
+        handle_predefined_question("What are Mounaim's key skills?")
+with col3:
+    if st.button("Work Experience"):
+        handle_predefined_question("Describe Mounaim's work experience.")
+with col4:
+    if st.button("Projects"):
+        handle_predefined_question("What projects has Mounaim worked on?")
+
+# Main chat interface with a more engaging prompt
+if prompt := st.chat_input("Ask me something about Mounaim, or try one of the buttons above!"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user", avatar=USER_AVATAR):
         st.markdown(prompt)
