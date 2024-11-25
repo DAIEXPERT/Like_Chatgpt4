@@ -8,6 +8,29 @@ import streamlit as st
 from dotenv import load_dotenv
 from openai import OpenAI
 
+def handle_predefined_question(question):
+    # Add the predefined question to the chat history
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user", avatar=USER_AVATAR):
+        st.markdown(question)
+
+    # Retrieve context from vectorstore and generate response
+    context = retrieve_context(question)
+    full_prompt = f"Context: {context}\n\nQuestion: {question}"
+    
+    with st.chat_message("assistant", avatar=BOT_AVATAR):
+        message_placeholder = st.empty()
+        full_response = ""
+        for response in client.chat.completions.create(
+            model=st.session_state["openai_model"],
+            messages=[{"role": "user", "content": full_prompt}],
+            stream=True,
+        ):
+            full_response += response.choices[0].delta.content or ""
+            message_placeholder.markdown(full_response + "|")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+    
 # Load environment variables
 load_dotenv()
 
