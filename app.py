@@ -11,7 +11,7 @@ from openai import OpenAI
 # Load environment variables
 load_dotenv()
 
-st.title("Chat with Preloaded PDF")
+st.title("Mounaim's resume")
 
 USER_AVATAR = "👤"
 BOT_AVATAR = "🤖"
